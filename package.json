@@ -1,0 +1,25 @@
+{
+  "name": "tygl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "webpack-dev-server --mode development --progress",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Jaesung Park",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "css-loader": "^4.2.1",
+    "html-webpack-plugin": "^4.3.0",
+    "raw-loader": "^4.0.1",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
