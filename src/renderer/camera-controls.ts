@@ -11,7 +11,7 @@ export class CameraControls {
   private camera: Camera;
   private element: HTMLElement;
 
-  private center: Vector3;
+  center: Vector3;
 
   // eye in spherical coordinate: (cos theta sin phi, sin theta sin phi, cos phi)
   private distance: number;
@@ -136,8 +136,6 @@ export class CameraControls {
   }
 
   private onKeyDown = (event: KeyboardEvent) => {
-    event.preventDefault();
-
     for (let i = 0; i < this.codes.length; i++) {
       if (this.codes[i] === event.code) {
         this.keyStatus[i] = true;
@@ -147,8 +145,6 @@ export class CameraControls {
   }
 
   private onKeyUp = (event: KeyboardEvent) => {
-    event.preventDefault();
-
     for (let i = 0; i < this.codes.length; i++) {
       if (this.codes[i] === event.code) {
         this.keyStatus[i] = false;

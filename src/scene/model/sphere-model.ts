@@ -18,8 +18,6 @@ export class SphereModel extends Model {
       {position: [0, 0, 1], normal: [0, 0, 1]},
       {position: [0, 0, -1], normal: [0, 0, -1]},
     );
-    this.addElementIndex(0, 1);
-
     for (let i = 0; i < this.thetaSegments; i++) {
       const theta = 2. * Math.PI * i / this.thetaSegments;
 

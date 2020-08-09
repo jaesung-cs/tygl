@@ -10,7 +10,7 @@ import {
 import { Scene, Camera } from './scene';
 import { Model, SphereModel } from './scene/model';
 import { MeshColorMaterial } from './scene/material';
-import { Affine3 } from './math';
+import { Affine3, Vector3 } from './math';
 import { CameraControls } from './renderer/camera-controls';
 
 export class Viewer {
@@ -19,7 +19,10 @@ export class Viewer {
   private context: WebGL2RenderingContext;
 
   private model: Model;
+  private modelTransform: Affine3 = new Affine3();
+
   private sphereModel: Model;
+  private sphereModelTransform: Affine3 = new Affine3();
 
   private scene: Scene;
 
@@ -27,7 +30,6 @@ export class Viewer {
   private cameraControls: CameraControls;
 
   private meshColorMaterial: MeshColorMaterial;
-  private modelTransform: Affine3 = new Affine3();
   
   //The time (milliseconds) when `renderingLoop()` was last called.
   private prevTime: number | undefined;
@@ -82,8 +84,8 @@ export class Viewer {
     this.model.addVertex(
       {position: [-1, -1, 0],  normal: [1, 0, 0]},
       {position: [1, -1, 0], normal: [0, 1, 0]},
-      {position: [-1, 1, 1], normal: [0, 0, 1]},
-      {position: [1, 1, 1],  normal: [1, 1, 0]},
+      {position: [-1, 1, 0], normal: [0, 0, 1]},
+      {position: [1, 1, 0],  normal: [1, 1, 0]},
     );
     this.model.addElementIndex(0, 1, 2, 3);
     this.model.endModel();
@@ -125,6 +127,12 @@ export class Viewer {
 
     this.meshColorMaterial.use();
     this.model.draw();
+
+    // Put sphere model at camera center
+    this.sphereModelTransform.setIdentity();
+    this.sphereModelTransform.scale(new Vector3(0.1, 0.1, 0.1));
+    this.sphereModelTransform.translate(this.cameraControls.center);
+    this.meshColorMaterial.updateModelMatrix(this.sphereModelTransform);
 
     this.sphereModel.draw();
     

@@ -16,7 +16,7 @@ export class Camera {
 
   private direction_: Vector3 = new Vector3(0, 1, 0);
 
-  near: number = 0.01;
+  near: number = 0.1;
   far: number = 100.;
 
   // Orthographic
@@ -124,6 +124,6 @@ export class Camera {
     result.data[12] = 0;
     result.data[13] = 0;
     result.data[14] = - 2. * this.far * this.near / (this.far - this.near);
-    result.data[15] = 1;
+    result.data[15] = 0;
   }
 }
