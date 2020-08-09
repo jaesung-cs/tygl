@@ -1,15 +1,9 @@
 import {
-  VertexArrayBuffer,
-  ElementBuffer,
-  VertexArray,
   DrawMode,
-  VertexShader,
-  FragmentShader,
-  Program,
 } from './gl';
 import { Scene, Camera } from './scene';
-import { Model, SphereModel, AxisModel, GridModel } from './scene/model';
-import { MeshColorMaterial } from './scene/material';
+import { Model, SphereModel, AxisModel, GridModel, SurfaceModel } from './scene/model';
+import { MeshColorMaterial, SurfaceMaterial } from './scene/material';
 import { Affine3, Vector3 } from './math';
 import { CameraControls } from './renderer/camera-controls';
 
@@ -18,8 +12,8 @@ export class Viewer {
   private canvas: HTMLCanvasElement;
   private context: WebGL2RenderingContext;
 
-  private model: Model;
-  private modelTransform: Affine3 = new Affine3();
+  private surfaceModel: SurfaceModel;
+  private surfaceModelTransform: Affine3 = new Affine3();
 
   private sphereModel: Model;
   private sphereModelTransform: Affine3 = new Affine3();
@@ -33,6 +27,7 @@ export class Viewer {
   private camera: Camera = new Camera();
   private cameraControls: CameraControls;
 
+  private surfaceMaterial: SurfaceMaterial;
   private meshColorMaterial: MeshColorMaterial;
   
   //The time (milliseconds) when `renderingLoop()` was last called.
@@ -77,27 +72,14 @@ export class Viewer {
     this.resize();
 
     this.meshColorMaterial = new MeshColorMaterial(gl);
-
-    this.model = new Model(gl);
-
-    this.model.beginModel({
-      hasPosition: true,
-      hasNormal: true,
-    }, DrawMode.TRIANGLE_STRIP, true);
-    
-    this.model.addVertex(
-      {position: [-1, -1, 0],  normal: [1, 0, 0]},
-      {position: [1, -1, 0], normal: [0, 1, 0]},
-      {position: [-1, 1, 0], normal: [0, 0, 1]},
-      {position: [1, 1, 0],  normal: [1, 1, 0]},
-    );
-    this.model.addElementIndex(0, 1, 2, 3);
-    this.model.endModel();
+    this.surfaceMaterial = new SurfaceMaterial(gl);
 
     this.sphereModel = new SphereModel(gl);
 
     this.axisModel = new AxisModel(gl);
     this.gridModel = new GridModel(gl);
+
+    this.surfaceModel = new SurfaceModel(gl);
 
     this.cameraControls = new CameraControls(this.camera, this.element);
 
@@ -116,7 +98,6 @@ export class Viewer {
     const dt = this.prevTime === undefined ? 0. : time - this.prevTime;
     this.prevTime = time;
 
-    const scope = this;
     const gl = this.context;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -130,20 +111,23 @@ export class Viewer {
     this.cameraControls.update(dt);
 
     this.meshColorMaterial.use();
-    
+    this.meshColorMaterial.updateCameraUniforms(this.camera);
+    this.meshColorMaterial.updateModelMatrix(this.identityTransform);
+
     // grid draw
     gl.depthFunc(gl.ALWAYS);
-    this.meshColorMaterial.updateModelMatrix(this.identityTransform);
     this.gridModel.draw();
     this.axisModel.draw();
     gl.depthFunc(gl.LESS);
 
-    this.meshColorMaterial.updateCameraUniforms(this.camera);
-    this.meshColorMaterial.updateModelMatrix(this.modelTransform);
-
-    this.model.draw();
+    this.surfaceMaterial.use();
+    this.surfaceMaterial.updateCameraUniforms(this.camera);
+    this.surfaceMaterial.updateModelMatrix(this.surfaceModelTransform);
+    this.surfaceModel.draw();
 
     // Put sphere model at camera center
+    this.meshColorMaterial.use();
+
     this.sphereModelTransform.setIdentity();
     this.sphereModelTransform.scale(new Vector3(0.02, 0.02, 0.01));
     this.sphereModelTransform.translate(this.cameraControls.center);
