@@ -27,7 +27,7 @@ export abstract class Buffer extends GlBase {
   }
 
   // Assumption: this buffer is bound
-  bufferData(data: Float32Array | Int32Array) {
+  bufferData(data: Float32Array | Int32Array | Uint32Array) {
     if (this.size < data.byteLength) {
       this.gl.bufferData(this.target, data, this.gl.STATIC_DRAW);
       this.size = data.byteLength;

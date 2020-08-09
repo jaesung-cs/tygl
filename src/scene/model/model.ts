@@ -135,7 +135,7 @@ export class Model extends ModelBase {
 
     if (this.hasElements) {
       this.ebo.bind();
-      this.ebo.bufferData(new Int32Array(this.elementBuffer));
+      this.ebo.bufferData(new Uint32Array(this.elementBuffer));
       this.elementBuffer = [];
     }
 

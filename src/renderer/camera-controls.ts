@@ -31,9 +31,9 @@ export class CameraControls {
   private keyStatus: boolean[] = [];
 
   // Motion sensitivities
-  private rotationSensitivity: number = 0.005;
-  private translationSensitivity: number = 0.005;
-  private motionSpeed: number = 0.005;
+  private rotationSensitivity: number = 0.003;
+  private translationSensitivity: number = 0.003;
+  private motionSpeed: number = 0.002;
   private zoomDampingFactor: number = 0.997;
 
   constructor(camera: Camera, element: HTMLElement, distance?: number) {

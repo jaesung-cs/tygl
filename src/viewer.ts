@@ -8,7 +8,7 @@ import {
   Program,
 } from './gl';
 import { Scene, Camera } from './scene';
-import { Model } from './scene/model';
+import { Model, SphereModel } from './scene/model';
 import { MeshColorMaterial } from './scene/material';
 import { Affine3 } from './math';
 import { CameraControls } from './renderer/camera-controls';
@@ -19,6 +19,7 @@ export class Viewer {
   private context: WebGL2RenderingContext;
 
   private model: Model;
+  private sphereModel: Model;
 
   private scene: Scene;
 
@@ -87,9 +88,12 @@ export class Viewer {
     this.model.addElementIndex(0, 1, 2, 3);
     this.model.endModel();
 
+    this.sphereModel = new SphereModel(gl);
+
     this.cameraControls = new CameraControls(this.camera, this.element);
 
     gl.clearColor(1, 1, 1, 1);
+    gl.enable(gl.DEPTH_TEST);
   }
 
   //
@@ -121,6 +125,8 @@ export class Viewer {
 
     this.meshColorMaterial.use();
     this.model.draw();
+
+    this.sphereModel.draw();
     
     requestAnimationFrame(this.renderingLoop);
   }
