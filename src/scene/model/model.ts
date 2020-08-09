@@ -1,5 +1,5 @@
-import { VertexArray, VertexArrayBuffer, ElementBuffer, DrawMode } from '../gl';
-import { GL } from '../gl/gl-base';
+import { VertexArray, VertexArrayBuffer, ElementBuffer, DrawMode } from '../../gl';
+import { GL } from '../../gl/gl-base';
 import { ModelBase } from './model-base';
 
 const AttributeIndexSize = {
@@ -10,19 +10,19 @@ const AttributeIndexSize = {
 
 type AttributeStride = number;
 
-interface AttributeOffset {
+interface IAttributeOffset {
   position: number,
   normal: number,
   texCoord: number,
 }
 
-export interface Attributes {
+export interface IAttributes {
   hasPosition?: boolean;
   hasNormal?: boolean;
   hasTexCoord?: boolean;
 }
 
-export interface Vertex {
+export interface IVertex {
   position?: number[],
   normal?: number[],
   texCoord?: number[],
@@ -36,7 +36,7 @@ export class Model extends ModelBase {
   private ebo: ElementBuffer;
 
   private hasModelBegun: boolean = false;
-  private modelAttributes: Attributes;
+  private modelAttributes: IAttributes;
 
   private buffer: number[] = [];
   private elementBuffer: number[] = [];
@@ -45,7 +45,7 @@ export class Model extends ModelBase {
   private count: number;
 
   private attributeStride: AttributeStride;
-  private attributeOffset: AttributeOffset;
+  private attributeOffset: IAttributeOffset;
 
   private drawMode: DrawMode;
 
@@ -57,7 +57,7 @@ export class Model extends ModelBase {
     this.ebo = new ElementBuffer(gl);
   }
 
-  beginModel(attributes: Attributes, drawMode: DrawMode, hasElements: boolean = false) {
+  beginModel(attributes: IAttributes, drawMode: DrawMode, hasElements: boolean = false) {
     if (this.hasModelBegun) {
       console.error('model construction has not been ended.');
       return;
@@ -90,7 +90,7 @@ export class Model extends ModelBase {
     }
   }
 
-  addVertex(...vertices: Vertex[]) {
+  addVertex(...vertices: IVertex[]) {
     const scope = this;
 
     vertices.forEach(vertex => {

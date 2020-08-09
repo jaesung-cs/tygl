@@ -1,8 +1,14 @@
 import { Vector3, Quaternion } from '.';
 
 export class Affine3 {
-  private rotation: Quaternion = new Quaternion();
-  private translation: Vector3 = new Vector3();
+  private rotation_: Quaternion = new Quaternion();
+  private translation_: Vector3 = new Vector3();
+
+  get rotation() { return this.rotation_; }
+  set rotation(q: Quaternion) { this.rotation_ = q; }
+
+  get translation() { return this.translation_; }
+  set translation(t: Vector3) { this.translation_ = t; }
 
   constructor() {
   }

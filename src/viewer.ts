@@ -6,27 +6,30 @@ import {
   VertexShader,
   FragmentShader,
   Program,
-} from './renderer/gl';
-import { Scene } from './scene';
-import { Model } from './renderer/resource';
-
-// Shader files
-import vertexShaderSource from './renderer/shader/test.vert';
-import fragmentShaderSource from './renderer/shader/test.frag';
-import { Vector3 } from './math';
+} from './gl';
+import { Scene, Camera } from './scene';
+import { Model } from './scene/model';
+import { MeshColorMaterial } from './scene/material';
+import { Affine3 } from './math';
+import { CameraControls } from './renderer/camera-controls';
 
 export class Viewer {
   private element: HTMLElement;
   private canvas: HTMLCanvasElement;
   private context: WebGL2RenderingContext;
 
-  private vertexShader: VertexShader;
-  private fragmentShader: FragmentShader;
-  private testProgram: Program;
-
   private model: Model;
 
   private scene: Scene;
+
+  private camera: Camera = new Camera();
+  private cameraControls: CameraControls;
+
+  private meshColorMaterial: MeshColorMaterial;
+  private modelTransform: Affine3 = new Affine3();
+  
+  //The time (milliseconds) when `renderingLoop()` was last called.
+  private prevTime: number | undefined;
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -66,14 +69,7 @@ export class Viewer {
 
     this.resize();
 
-    this.vertexShader = new VertexShader(this.context, vertexShaderSource);
-    this.fragmentShader = new FragmentShader(this.context, fragmentShaderSource);
-
-    this.testProgram = new Program(this.context, this.vertexShader, this.fragmentShader);
-
-    // Shaders will never be used any more after linking program
-    this.vertexShader.dispose();
-    this.fragmentShader.dispose();
+    this.meshColorMaterial = new MeshColorMaterial(gl);
 
     this.model = new Model(gl);
 
@@ -84,12 +80,14 @@ export class Viewer {
     
     this.model.addVertex(
       {position: [-1, -1, 0],  normal: [1, 0, 0]},
-      {position: [1, -0.5, 0], normal: [0, 1, 0]},
-      {position: [-0.5, 1, 0], normal: [0, 0, 1]},
-      {position: [1, 0.5, 0],  normal: [1, 1, 0]},
+      {position: [1, -1, 0], normal: [0, 1, 0]},
+      {position: [-1, 1, 1], normal: [0, 0, 1]},
+      {position: [1, 1, 1],  normal: [1, 1, 0]},
     );
     this.model.addElementIndex(0, 1, 2, 3);
     this.model.endModel();
+
+    this.cameraControls = new CameraControls(this.camera, this.element);
 
     gl.clearColor(1, 1, 1, 1);
   }
@@ -98,22 +96,32 @@ export class Viewer {
   // rendering
   //
   startRenderingLoop(): void {
-    const scope = this;
-    requestAnimationFrame(() => scope.renderingLoop());
+    requestAnimationFrame(this.renderingLoop);
   }
 
-  private renderingLoop(): void {
+  private renderingLoop = (time: number) => {
+    const dt = this.prevTime === undefined ? 0. : time - this.prevTime;
+    this.prevTime = time;
+
     const scope = this;
     const gl = this.context;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
-    this.testProgram.use();
 
+    // Camera update
+    const aspect = this.canvas.width / this.canvas.height;
+    this.camera.left = -aspect;
+    this.camera.right = aspect;
+    this.camera.aspect = aspect;
+
+    this.cameraControls.update(dt);
+
+    this.meshColorMaterial.updateCameraUniforms(this.camera);
+    this.meshColorMaterial.updateModelMatrix(this.modelTransform);
+
+    this.meshColorMaterial.use();
     this.model.draw();
     
-    this.testProgram.done();
-
-    requestAnimationFrame(() => scope.renderingLoop());
+    requestAnimationFrame(this.renderingLoop);
   }
 }

@@ -1,4 +1,4 @@
-import { Matrix3 } from '.';
+import { Matrix3, Matrix4 } from './';
 
 export class Quaternion {
   // x, y, z, w
@@ -16,7 +16,7 @@ export class Quaternion {
   get w() { return this.data[3]; }
   set w(w: number) { this.data[3] = w; }
 
-  toMatrix(result: Matrix3): void {
+  toMatrix3(result: Matrix3): void {
     result.data[0] = 1. - 2. * (this.yy() + this.zz());
     result.data[1] = 2. * (this.xy() + this.zw());
     result.data[2] = 2. * (this.xz() - this.yw());
@@ -28,6 +28,28 @@ export class Quaternion {
     result.data[6] = 2. * (this.xz() + this.yw());
     result.data[7] = 2. * (this.yz() - this.xw());
     result.data[8] = 1. - 2. * (this.xx() + this.xy());
+  }
+
+  toMatrix4(result: Matrix4): void {
+    result.data[0] = 1. - 2. * (this.yy() + this.zz());
+    result.data[1] = 2. * (this.xy() + this.zw());
+    result.data[2] = 2. * (this.xz() - this.yw());
+    result.data[3] = 0.;
+
+    result.data[4] = 2. * (this.xy() - this.zw());
+    result.data[5] = 1. - 2. * (this.xx() + this.zz());
+    result.data[6] = 2. * (this.yz() + this.xw());
+    result.data[7] = 0.;
+
+    result.data[ 8] = 2. * (this.xz() + this.yw());
+    result.data[ 9] = 2. * (this.yz() - this.xw());
+    result.data[10] = 1. - 2. * (this.xx() + this.xy());
+    result.data[11] = 0.;
+    
+    result.data[12] = 0.;
+    result.data[13] = 0.;
+    result.data[14] = 0.;
+    result.data[15] = 1.;
   }
 
   length(): number { return Math.sqrt(this.xx() + this.yy() + this.zz() + this.ww()); }

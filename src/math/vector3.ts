@@ -22,6 +22,18 @@ export class Vector3 {
     return this;
   }
 
+  set(x: number, y: number, z: number): Vector3 {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+
+    return this;
+  }
+
+  clone(): Vector3 {
+    return new Vector3(this.x, this.y, this.z);
+  }
+
   add(v: Vector3): Vector3 {
     this.x += v.x;
     this.y += v.y;
@@ -54,12 +66,20 @@ export class Vector3 {
     return this;
   }
 
+  negate(): Vector3 {
+    return this.multiplyByScalar(-1.);
+  }
+
   length(): number {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
 
   normalize(): Vector3 {
     return this.multiplyByScalar(1. / this.length());
+  }
+
+  dot(v: Vector3): number {
+    return this.x * v.x + this.y * v.y + this.z * v.z;
   }
 
   cross(v: Vector3): Vector3 {
