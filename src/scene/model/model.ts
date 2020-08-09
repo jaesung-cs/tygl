@@ -42,7 +42,8 @@ export class Model extends ModelBase {
   private elementBuffer: number[] = [];
 
   private hasElements: boolean = false;
-  private count: number;
+  private elementCount: number;
+  private vertexCount: number;
 
   private attributeStride: AttributeStride;
   private attributeOffset: IAttributeOffset;
@@ -66,7 +67,8 @@ export class Model extends ModelBase {
     this.drawMode = drawMode;
     this.modelAttributes = attributes;
     this.hasElements = hasElements;
-    this.count = 0;
+    this.elementCount = 0;
+    this.vertexCount = 0;
     this.hasModelBegun = true;
 
     this.attributeOffset = {
@@ -116,11 +118,13 @@ export class Model extends ModelBase {
         }
       }
     });
+
+    this.vertexCount += vertices.length;
   }
 
   addElementIndex(...indices: number[]) {
     this.elementBuffer.push(...indices);
-    this.count += indices.length;
+    this.elementCount += indices.length;
   }
 
   endModel() {
@@ -169,9 +173,9 @@ export class Model extends ModelBase {
     }
 
     if (this.hasElements) {
-      this.vao.setDrawElementMode(this.drawMode, this.count);
+      this.vao.setDrawElementMode(this.drawMode, this.elementCount);
     } else {
-      this.vao.setDrawArrayMode(this.drawMode, this.count);
+      this.vao.setDrawArrayMode(this.drawMode, this.vertexCount);
     }
   }
 

@@ -8,7 +8,7 @@ import {
   Program,
 } from './gl';
 import { Scene, Camera } from './scene';
-import { Model, SphereModel } from './scene/model';
+import { Model, SphereModel, AxisModel, GridModel } from './scene/model';
 import { MeshColorMaterial } from './scene/material';
 import { Affine3, Vector3 } from './math';
 import { CameraControls } from './renderer/camera-controls';
@@ -23,6 +23,10 @@ export class Viewer {
 
   private sphereModel: Model;
   private sphereModelTransform: Affine3 = new Affine3();
+
+  private identityTransform: Affine3 = new Affine3();
+  private axisModel: AxisModel;
+  private gridModel: GridModel;
 
   private scene: Scene;
 
@@ -92,6 +96,9 @@ export class Viewer {
 
     this.sphereModel = new SphereModel(gl);
 
+    this.axisModel = new AxisModel(gl);
+    this.gridModel = new GridModel(gl);
+
     this.cameraControls = new CameraControls(this.camera, this.element);
 
     gl.clearColor(1, 1, 1, 1);
@@ -122,15 +129,23 @@ export class Viewer {
 
     this.cameraControls.update(dt);
 
+    this.meshColorMaterial.use();
+    
+    // grid draw
+    gl.depthFunc(gl.ALWAYS);
+    this.meshColorMaterial.updateModelMatrix(this.identityTransform);
+    this.gridModel.draw();
+    this.axisModel.draw();
+    gl.depthFunc(gl.LESS);
+
     this.meshColorMaterial.updateCameraUniforms(this.camera);
     this.meshColorMaterial.updateModelMatrix(this.modelTransform);
 
-    this.meshColorMaterial.use();
     this.model.draw();
 
     // Put sphere model at camera center
     this.sphereModelTransform.setIdentity();
-    this.sphereModelTransform.scale(new Vector3(0.1, 0.1, 0.1));
+    this.sphereModelTransform.scale(new Vector3(0.02, 0.02, 0.01));
     this.sphereModelTransform.translate(this.cameraControls.center);
     this.meshColorMaterial.updateModelMatrix(this.sphereModelTransform);
 

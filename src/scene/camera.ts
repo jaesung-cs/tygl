@@ -17,7 +17,7 @@ export class Camera {
   private direction_: Vector3 = new Vector3(0, 1, 0);
 
   near: number = 0.1;
-  far: number = 100.;
+  far: number = 1000.;
 
   // Orthographic
   left: number = -1;

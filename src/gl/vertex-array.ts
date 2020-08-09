@@ -6,6 +6,7 @@ enum DrawIndex {
 }
 
 export enum DrawMode {
+  LINES,
   TRIANGLES,
   TRIANGLE_STRIP,
 }
@@ -67,6 +68,7 @@ export class VertexArray extends GlBase {
 
   private drawModeToGlEnum(mode: DrawMode) {
     switch (mode) {
+    case DrawMode.LINES: return this.gl.LINES;
     case DrawMode.TRIANGLES: return this.gl.TRIANGLES;
     case DrawMode.TRIANGLE_STRIP: return this.gl.TRIANGLE_STRIP;
     default: console.error('unknown draw mode');

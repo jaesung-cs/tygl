@@ -1,7 +1,7 @@
 import { GL } from '../../gl/gl-base';
 import { Material } from './material';
-import vertexShaderSource from './shader/mesh-color.vert';
-import fragmentShaderSource from './shader/mesh-color.frag';
+import vertexShaderSource from './shader/color.vert';
+import fragmentShaderSource from './shader/color.frag';
 
 export class MeshColorMaterial extends Material {
   constructor(gl: GL) {
