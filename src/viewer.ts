@@ -8,10 +8,12 @@ import {
   Program,
 } from './renderer/gl';
 import { Scene } from './scene';
+import { Model } from './renderer/resource';
 
 // Shader files
 import vertexShaderSource from './renderer/shader/test.vert';
 import fragmentShaderSource from './renderer/shader/test.frag';
+import { Vector3 } from './math';
 
 export class Viewer {
   private element: HTMLElement;
@@ -22,9 +24,7 @@ export class Viewer {
   private fragmentShader: FragmentShader;
   private testProgram: Program;
 
-  private arrayBuffer: VertexArrayBuffer;
-  private elementBuffer: ElementBuffer;
-  private vertexArray: VertexArray;
+  private model: Model;
 
   private scene: Scene;
 
@@ -75,38 +75,21 @@ export class Viewer {
     this.vertexShader.dispose();
     this.fragmentShader.dispose();
 
-    this.vertexArray = new VertexArray(this.context);
-    this.arrayBuffer = new VertexArrayBuffer(this.context);
-    this.elementBuffer = new ElementBuffer(this.context);
+    this.model = new Model(gl);
+
+    this.model.beginModel({
+      hasPosition: true,
+      hasNormal: true,
+    }, DrawMode.TRIANGLE_STRIP, true);
     
-    this.vertexArray.bind();
-    this.arrayBuffer.bind();
-
-    let buffer = new Float32Array([
-      -1, -1, 0, 1, 0, 0,
-      1, -0.5, 0, 0, 1, 0,
-      -0.5, 1, 0, 0, 0, 1,
-      1, 0.5, 0, 1, 1, 0,
-    ]);
-
-    let elementBuffer = new Int32Array([
-      0, 1, 2, 3
-    ]);
-
-    this.arrayBuffer.bufferData(buffer);
-    gl.enableVertexAttribArray(0);
-    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 6*4, 0);
-    gl.enableVertexAttribArray(1);
-    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 6*4, 3*4);
-
-    this.elementBuffer.bind();
-    this.elementBuffer.bufferData(elementBuffer);
-
-    this.vertexArray.unbind();
-    this.arrayBuffer.unbind();
-    this.elementBuffer.unbind();
-
-    this.vertexArray.setDrawElementMode(DrawMode.TRIANGLE_STRIP, 4);
+    this.model.addVertex(
+      {position: [-1, -1, 0],  normal: [1, 0, 0]},
+      {position: [1, -0.5, 0], normal: [0, 1, 0]},
+      {position: [-0.5, 1, 0], normal: [0, 0, 1]},
+      {position: [1, 0.5, 0],  normal: [1, 1, 0]},
+    );
+    this.model.addElementIndex(0, 1, 2, 3);
+    this.model.endModel();
 
     gl.clearColor(1, 1, 1, 1);
   }
@@ -127,10 +110,8 @@ export class Viewer {
     
     this.testProgram.use();
 
-    this.vertexArray.bind();
-    this.vertexArray.draw();
-    this.vertexArray.unbind();
-
+    this.model.draw();
+    
     this.testProgram.done();
 
     requestAnimationFrame(() => scope.renderingLoop());
