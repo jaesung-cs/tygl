@@ -3,6 +3,12 @@ import { Affine3 } from './';
 export class Matrix4 {
   data: number[] = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
+  copy(m: Matrix4) {
+    for (let i = 0; i < 16; i++) {
+      this.data[i] = m.data[i];
+    }
+  }
+
   fromAffine(affine: Affine3): Matrix4 {
     affine.toMatrix(this);
     return this;

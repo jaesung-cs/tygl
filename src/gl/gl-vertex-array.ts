@@ -11,7 +11,7 @@ export enum DrawMode {
   TRIANGLE_STRIP,
 }
 
-export class VertexArray extends GlBase {
+export class GlVertexArray extends GlBase {
   readonly vertexArray: WebGLVertexArrayObject;
 
   private drawIndex: DrawIndex = DrawIndex.ARRAYS;

@@ -1,6 +1,6 @@
 import { GL, GlBase } from './gl-base';
 
-export abstract class Buffer extends GlBase {
+export abstract class GlBuffer extends GlBase {
   readonly buffer: WebGLBuffer;
   readonly target: number;
 
@@ -37,13 +37,13 @@ export abstract class Buffer extends GlBase {
   }
 }
 
-export class VertexArrayBuffer extends Buffer {
+export class GlVertexArrayBuffer extends GlBuffer {
   constructor(gl: GL) {
     super(gl, gl.ARRAY_BUFFER);
   }
 }
 
-export class ElementBuffer extends Buffer {
+export class GlElementBuffer extends GlBuffer {
   constructor(gl: GL) {
     super(gl, gl.ELEMENT_ARRAY_BUFFER);
   }

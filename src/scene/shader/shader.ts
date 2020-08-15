@@ -1,5 +1,5 @@
 import { GL, GlBase } from '../../gl/gl-base';
-import { VertexShader, FragmentShader, Program } from '../../gl';
+import { GlVertexShader, GlFragmentShader, GlProgram } from '../../gl';
 import { Camera } from '../camera';
 import { Matrix3, Matrix4, Affine3 } from '../../math';
 
@@ -10,8 +10,8 @@ interface IDefaultUniforms {
   uInverseModelMatrix: Matrix3,
 }
 
-export class Material extends GlBase {
-  private program: Program;
+export class Shader extends GlBase {
+  private program: GlProgram;
 
   protected uniforms: IDefaultUniforms = {
     uProjectionMatrix: new Matrix4(),
@@ -23,10 +23,10 @@ export class Material extends GlBase {
   constructor(gl: GL, vertexShaderSource: string, fragmentShaderSource: string) {
     super(gl);
 
-    const vertexShader = new VertexShader(gl, vertexShaderSource);
-    const fragmentShader = new FragmentShader(gl, fragmentShaderSource);
+    const vertexShader = new GlVertexShader(gl, vertexShaderSource);
+    const fragmentShader = new GlFragmentShader(gl, fragmentShaderSource);
 
-    this.program = new Program(gl, vertexShader, fragmentShader);
+    this.program = new GlProgram(gl, vertexShader, fragmentShader);
 
     vertexShader.dispose();
     fragmentShader.dispose();

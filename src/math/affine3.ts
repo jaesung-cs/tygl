@@ -7,6 +7,11 @@ export class Affine3 {
   constructor() {
   }
 
+  copy(affine: Affine3): Affine3 {
+    this.matrix.copy(affine.matrix);
+    return this;
+  }
+
   toMatrix(m: Matrix4) {
     for (let i = 0; i < 16; i++) {
       m.data[i] = this.matrix.data[i];
@@ -58,6 +63,15 @@ export class Affine3 {
     this.matrix.data[10] *= s.z;
     this.matrix.data[14] *= s.z;
     
+    return this;
+  }
+
+  reflectZ(): Affine3 {
+    this.matrix.data[2] *= -1.;
+    this.matrix.data[6] *= -1.;
+    this.matrix.data[10] *= -1.;
+    this.matrix.data[14] *= -1.;
+
     return this;
   }
 }

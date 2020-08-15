@@ -1,9 +1,6 @@
-import {
-  DrawMode,
-} from './gl';
 import { Scene, Camera } from './scene';
-import { Model, SphereModel, AxisModel, GridModel, SurfaceModel } from './scene/model';
-import { MeshColorMaterial, SurfaceMaterial } from './scene/material';
+import { Model, SphereModel, AxisModel, GridModel, SurfaceModel, GroundModel } from './scene/model';
+import { MeshColorShader, SurfaceShader, ReflectiveGroundStencilShader, ReflectiveGroundRenderShader } from './scene/shader';
 import { Affine3, Vector3 } from './math';
 import { CameraControls } from './renderer/camera-controls';
 
@@ -14,9 +11,13 @@ export class Viewer {
 
   private surfaceModel: SurfaceModel;
   private surfaceModelTransform: Affine3 = new Affine3();
+  private reflectedSurfaceModelTransform: Affine3 = new Affine3();
 
   private sphereModel: Model;
   private sphereModelTransform: Affine3 = new Affine3();
+
+  private reflectiveGroundModel: GroundModel;
+  private reflectiveGroundModelTransform: Affine3 = new Affine3();
 
   private identityTransform: Affine3 = new Affine3();
   private axisModel: AxisModel;
@@ -27,8 +28,9 @@ export class Viewer {
   private camera: Camera = new Camera();
   private cameraControls: CameraControls;
 
-  private surfaceMaterial: SurfaceMaterial;
-  private meshColorMaterial: MeshColorMaterial;
+  private surfaceShader: SurfaceShader;
+  private meshColorShader: MeshColorShader;
+  private reflectiveGroundStencilShader: ReflectiveGroundStencilShader;
   
   //The time (milliseconds) when `renderingLoop()` was last called.
   private prevTime: number | undefined;
@@ -37,7 +39,9 @@ export class Viewer {
     this.element = element;
 
     this.canvas = document.createElement('canvas');
-    this.context = this.canvas.getContext('webgl2');
+    this.context = this.canvas.getContext('webgl2', {
+      stencil: true,
+    });
     const gl = this.context;
 
     element.appendChild(this.canvas);
@@ -71,8 +75,8 @@ export class Viewer {
 
     this.resize();
 
-    this.meshColorMaterial = new MeshColorMaterial(gl);
-    this.surfaceMaterial = new SurfaceMaterial(gl);
+    this.meshColorShader = new MeshColorShader(gl);
+    this.surfaceShader = new SurfaceShader(gl);
 
     this.sphereModel = new SphereModel(gl);
 
@@ -81,10 +85,20 @@ export class Viewer {
 
     this.surfaceModel = new SurfaceModel(gl);
 
+    this.reflectiveGroundModel = new GroundModel(gl);
+
     this.cameraControls = new CameraControls(this.camera, this.element);
+
+    this.reflectiveGroundStencilShader = new ReflectiveGroundStencilShader(gl);
+
+    this.reflectiveGroundModelTransform.scale(new Vector3(100, 100, 100));
 
     gl.clearColor(1, 1, 1, 1);
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.STENCIL_TEST);
+    
+    gl.frontFace(gl.CCW);
+    gl.disable(gl.CULL_FACE);
   }
 
   //
@@ -100,7 +114,7 @@ export class Viewer {
 
     const gl = this.context;
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
     // Camera update
     const aspect = this.canvas.width / this.canvas.height;
@@ -110,29 +124,51 @@ export class Viewer {
 
     this.cameraControls.update(dt);
 
-    this.meshColorMaterial.use();
-    this.meshColorMaterial.updateCameraUniforms(this.camera);
-    this.meshColorMaterial.updateModelMatrix(this.identityTransform);
-
-    // grid draw
+    // Grid draw
     gl.depthFunc(gl.ALWAYS);
+    this.meshColorShader.use();
+    this.meshColorShader.updateCameraUniforms(this.camera);
+    this.meshColorShader.updateModelMatrix(this.identityTransform);
     this.gridModel.draw();
     this.axisModel.draw();
     gl.depthFunc(gl.LESS);
 
-    this.surfaceMaterial.use();
-    this.surfaceMaterial.updateCameraUniforms(this.camera);
-    this.surfaceMaterial.updateModelMatrix(this.surfaceModelTransform);
+    // Ground stencil draw
+    gl.colorMask(false, false, false, false);
+    gl.depthMask(false);
+    gl.stencilMask(0xFF);
+    gl.stencilFunc(gl.ALWAYS, 1, 0xFF);
+    gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+    this.reflectiveGroundStencilShader.use();
+    this.reflectiveGroundStencilShader.updateCameraUniforms(this.camera);
+    this.reflectiveGroundStencilShader.updateModelMatrix(this.reflectiveGroundModelTransform);
+    this.reflectiveGroundModel.draw();
+
+    // Reflected object draw
+    gl.colorMask(true, true, true, true);
+    gl.depthMask(true);
+    gl.stencilFunc(gl.EQUAL, 1, 0xFF);
+    gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
+    this.surfaceShader.use();
+    this.surfaceShader.updateCameraUniforms(this.camera);
+    this.reflectedSurfaceModelTransform.copy(this.surfaceModelTransform).reflectZ();
+    this.surfaceShader.updateModelMatrix(this.reflectedSurfaceModelTransform);
+    this.surfaceModel.draw();
+
+    // Object draw
+    gl.stencilFunc(gl.ALWAYS, 0, 0xFF);
+    gl.stencilMask(0x00);
+    this.surfaceShader.use();
+    this.surfaceShader.updateCameraUniforms(this.camera);
+    this.surfaceShader.updateModelMatrix(this.surfaceModelTransform);
     this.surfaceModel.draw();
 
     // Put sphere model at camera center
-    this.meshColorMaterial.use();
-
+    this.meshColorShader.use();
     this.sphereModelTransform.setIdentity();
     this.sphereModelTransform.scale(new Vector3(0.02, 0.02, 0.01));
     this.sphereModelTransform.translate(this.cameraControls.center);
-    this.meshColorMaterial.updateModelMatrix(this.sphereModelTransform);
-
+    this.meshColorShader.updateModelMatrix(this.sphereModelTransform);
     this.sphereModel.draw();
     
     requestAnimationFrame(this.renderingLoop);

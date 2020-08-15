@@ -1,4 +1,4 @@
-import { VertexArray, VertexArrayBuffer, ElementBuffer, DrawMode } from '../../gl';
+import { GlVertexArray, GlVertexArrayBuffer, GlElementBuffer, DrawMode } from '../../gl';
 import { GL } from '../../gl/gl-base';
 import { ModelBase } from './model-base';
 
@@ -31,9 +31,9 @@ export interface IVertex {
 export class Model extends ModelBase {
   static readonly sizeofFloat = 4;
 
-  private vao: VertexArray;
-  private vbo: VertexArrayBuffer;
-  private ebo: ElementBuffer;
+  private vao: GlVertexArray;
+  private vbo: GlVertexArrayBuffer;
+  private ebo: GlElementBuffer;
 
   private hasModelBegun: boolean = false;
   private modelAttributes: IAttributes;
@@ -53,9 +53,9 @@ export class Model extends ModelBase {
   constructor(gl: GL) {
     super(gl);
 
-    this.vao = new VertexArray(gl);
-    this.vbo = new VertexArrayBuffer(gl);
-    this.ebo = new ElementBuffer(gl);
+    this.vao = new GlVertexArray(gl);
+    this.vbo = new GlVertexArrayBuffer(gl);
+    this.ebo = new GlElementBuffer(gl);
   }
 
   beginModel(attributes: IAttributes, drawMode: DrawMode, hasElements: boolean = false) {
@@ -140,12 +140,10 @@ export class Model extends ModelBase {
     if (this.hasElements) {
       this.ebo.bind();
       this.ebo.bufferData(new Uint32Array(this.elementBuffer));
-      this.elementBuffer = [];
     }
 
     this.vbo.bind();
     this.vbo.bufferData(new Float32Array(this.buffer));
-    this.buffer = [];
 
     this.setVaoAttribute(
       this.modelAttributes.hasPosition,

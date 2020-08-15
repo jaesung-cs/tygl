@@ -1,6 +1,6 @@
 import { GL, GlBase } from './gl-base';
 
-export abstract class Shader extends GlBase {
+export abstract class GlShader extends GlBase {
   readonly shader_: WebGLShader;
   private source: string;
   
@@ -29,19 +29,19 @@ export abstract class Shader extends GlBase {
 		if (!success) {
 			const log = gl.getShaderInfoLog(this.shader);
 			gl.deleteShader(this.shader);
-			throw Error(`Failed to compile WebGL shader:\n${log}`);
+			throw Error(`Failed to compile WebGL shader:\n${log}\n${source}`);
 		}
   }
 }
 
-export class VertexShader extends Shader {
+export class GlVertexShader extends GlShader {
   constructor(gl: GL, source: string) {
     super(gl, gl.VERTEX_SHADER);
     this.loadSource(source);
   }
 }
 
-export class FragmentShader extends Shader {
+export class GlFragmentShader extends GlShader {
   constructor(gl: GL, source: string) {
     super(gl, gl.FRAGMENT_SHADER);
     this.loadSource(source);

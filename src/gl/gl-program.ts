@@ -1,17 +1,17 @@
 import { GL, GlBase } from './gl-base';
 import {
-  VertexShader,
-  FragmentShader,
+  GlVertexShader,
+  GlFragmentShader,
 } from '.';
 import {
   Vector2, Vector3, Vector4,
   Matrix3, Matrix4,
 } from '../math';
 
-export class Program extends GlBase {
+export class GlProgram extends GlBase {
   private readonly program: WebGLProgram;
 
-  constructor(gl: GL, vertexShader: VertexShader, fragmentShader: FragmentShader) {
+  constructor(gl: GL, vertexShader: GlVertexShader, fragmentShader: GlFragmentShader) {
     super(gl);
 
     this.program = gl.createProgram();

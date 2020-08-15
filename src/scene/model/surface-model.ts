@@ -18,17 +18,13 @@ export class SurfaceModel extends Model {
       for (let xIndex = 0; xIndex <= this.numSegments; xIndex++) {
         const x = xIndex / this.numSegments;
         this.addVertex({texCoord: [x, y]});
-
-        console.log([x, y]);
       }
     }
 
     for (let yIndex = 0; yIndex < this.numSegments; yIndex++) {
       for (let xIndex = 0; xIndex <= this.numSegments; xIndex++) {
-        this.addElementIndex(xIndex + yIndex * (this.numSegments + 1));
         this.addElementIndex(xIndex + (yIndex + 1) * (this.numSegments + 1));
-
-        console.log([xIndex + yIndex * (this.numSegments + 1), xIndex + (yIndex + 1) * (this.numSegments + 1)]);
+        this.addElementIndex(xIndex + yIndex * (this.numSegments + 1));
       }
       this.addElementIndex(-1);
     }
