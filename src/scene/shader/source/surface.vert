@@ -17,5 +17,5 @@ void main() {
   vUv = uv;
   
   // TODO: compute position from uv coord
-  gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(cos((1. - uv.x) * pi), uv.y, sin((1. - uv.x) * pi), 1.);
+  gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(cos(2. * (1. - uv.x) * pi), uv.y * 10., 2. + sin(2. * (1. - uv.x) * pi), 1.);
 }

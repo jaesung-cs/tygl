@@ -11,7 +11,7 @@ interface IDefaultUniforms {
 }
 
 export class Shader extends GlBase {
-  private program: GlProgram;
+  protected program: GlProgram;
 
   protected uniforms: IDefaultUniforms = {
     uProjectionMatrix: new Matrix4(),
