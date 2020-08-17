@@ -3,7 +3,7 @@ import { DrawMode } from '../../gl';
 import { Model } from '.';
 
 export class SurfaceModel extends Model {
-  private readonly numSegments = 20;
+  private readonly numSegments = 32;
 
   constructor(gl: GL) {
     super(gl);

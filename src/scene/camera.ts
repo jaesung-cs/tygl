@@ -12,9 +12,9 @@ export class Camera {
   private projectionMode: ProjectionMode = ProjectionMode.PERSPECTIVE;
 
   private up_: Vector3 = new Vector3(0, 0, 1);
-  private eye_: Vector3 = new Vector3(0, -1, 0.5);
+  private eye_: Vector3 = new Vector3(5, -5, 5);
 
-  private direction_: Vector3 = new Vector3(0, 1, 0);
+  private direction_: Vector3 = new Vector3(-1, 1, -1).normalize();
 
   near: number = 0.1;
   far: number = 1000.;

@@ -19,9 +19,9 @@ out vec2 vTexCoord;
 void main() {
   vec4 modelPosition = uModelMatrix * vec4(position, 1.);
 
-  vPosition = modelPosition.xyz;
+  vPosition = modelPosition.xyz / modelPosition.w;
   vNormal = uInverseModelMatrix * normal;
   vTexCoord = texCoord;
-
+  
   gl_Position = uProjectionMatrix * uViewMatrix * modelPosition;
 }
