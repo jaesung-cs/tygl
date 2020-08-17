@@ -103,10 +103,14 @@ export class Viewer {
     this.reflectionRenderTarget = new RenderTarget(gl, ...this.getSize());
     this.blurRenderTarget = new RenderTarget(gl, ...this.getSize());
 
-    this.surfaceMaterial.ambient;
-    
+    this.surfaceMaterial.ambient.set(0.803922, 0.521569, 0.247059).multiplyByScalar(0.5);
+    this.surfaceMaterial.diffuse.set(0.803922, 0.521569, 0.247059).multiplyByScalar(0.5);
+    this.surfaceMaterial.specular.set(0., 0., 0.);
+
     this.cameraCenterMaterial.ambient.set(0.5, 0.5, 0.);
     this.cameraCenterMaterial.diffuse.set(0.5, 0.5, 0.);
+
+    this.light.position.set(1, 1, 1).normalize();
 
     this.resize();
 

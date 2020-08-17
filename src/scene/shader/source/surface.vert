@@ -17,8 +17,8 @@ out vec2 vUv;
 const float pi = 3.141592;
 
 void main() {
-  vec3 position = vec3(cos(2. * (1. - uv.x) * pi), (uv.y - 0.5) * 10., sin(2. * (1. - uv.x) * pi));
-  vec3 normal = vec3(cos(2. * (1. - uv.x) * pi), 0., sin(2. * (1. - uv.x) * pi));
+  vec3 position = vec3(cos(2. * (1. - uv.x) * pi), sin(2. * (1. - uv.x) * pi), (uv.y - 0.5) * 10.);
+  vec3 normal = vec3(cos(2. * (1. - uv.x) * pi), sin(2. * (1. - uv.x) * pi), 0.);
 
   vec4 modelPosition = uModelMatrix * vec4(position, 1.);
 
